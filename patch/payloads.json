@@ -1,0 +1,37 @@
+{
+  "guardMarker": "adt-vscode.forgetRfcPassword",
+  "extjsRelPath": "dist/_bundle/extension.js",
+  "pkgRelPath": "package.json",
+  "payloads": [
+    {
+      "target": "extjs",
+      "name": "activate-setup",
+      "find": "async function JI(i){",
+      "replace": "async function JI(i){try{if(!globalThis.__adtRfc){var __S=i.secrets,__IDX=\"adt-rfc-ids\",__PFX=\"adt-rfc-pwd::\";var __getIds=async function(){try{var s=await __S.get(__IDX);return s?JSON.parse(s):[];}catch(e){return [];}};var __setIds=async function(a){await __S.store(__IDX,JSON.stringify(a));};globalThis.__adtRfc={secrets:__S,pending:new Map(),usedSaved:new Set(),getIds:__getIds,get:async function(id){return await __S.get(__PFX+id);},save:async function(id,pwd){await __S.store(__PFX+id,pwd);var ids=await __getIds();if(ids.indexOf(id)<0){ids.push(id);await __setIds(ids);}},del:async function(id){await __S.delete(__PFX+id);var ids=(await __getIds()).filter(function(x){return x!==id;});await __setIds(ids);}};i.subscriptions.push(Vi.commands.registerCommand(\"adt-vscode.forgetRfcPassword\",async function(){var R=globalThis.__adtRfc;var ids=R?await R.getIds():[];if(!ids||!ids.length){Vi.window.showInformationMessage(\"ABAP RFC: no saved passwords to forget.\");return;}var pick=await Vi.window.showQuickPick(ids,{title:\"Forget Saved RFC Password\",placeHolder:\"Select a destination to forget its saved password\"});if(!pick)return;await R.del(pick);Vi.window.showInformationMessage(\"Forgot the saved RFC password for \"+pick+\".\");}));}}catch(__e){}"
+    },
+    {
+      "target": "extjs",
+      "name": "promptLogonInput-autouse",
+      "find": "async promptLogonInput(e){",
+      "replace": "async promptLogonInput(e){try{var __R=globalThis.__adtRfc;if(__R&&e&&e.id&&e.sensitiveFieldsSocketPort&&e.params&&e.params.length===1&&e.params[0].sensitive){var __pw=await __R.get(e.id);if(__pw){var __m=new Map();__m.set(e.params[0].name,__pw);try{await xI(e.sensitiveFieldsSocketPort,__m);__R.usedSaved.add(e.id);return{nonSensitiveFields:new Map()};}catch(__err){}}}}catch(__e){}"
+    },
+    {
+      "target": "extjs",
+      "name": "promptLogonInput-stash",
+      "find": "r.sensitive?t.set(r.name,s.trim()):n.set(r.name,s.trim())",
+      "replace": "r.sensitive?t.set(r.name,s.trim()):n.set(r.name,s.trim());try{if(r.sensitive&&globalThis.__adtRfc&&e&&e.id){globalThis.__adtRfc.pending.set(e.id,s.trim());globalThis.__adtRfc.usedSaved.delete(e.id);}}catch(__pe){}"
+    },
+    {
+      "target": "extjs",
+      "name": "handleLogonStateChanged",
+      "find": "async handleLogonStateChanged(e){",
+      "replace": "async handleLogonStateChanged(e){try{var __R=globalThis.__adtRfc;if(__R&&e&&e.destinationId){var __id=e.destinationId;if(e.logonState===\"connected\"){var __pw=__R.pending.get(__id);__R.pending.delete(__id);__R.usedSaved.delete(__id);if(__pw){(async function(){try{var __ex=await __R.get(__id);if(!__ex){var __c=await le.window.showInformationMessage(\"Remember the RFC password for \"+__id+\"? It will be stored in your OS keychain.\",\"Yes\",\"No\");if(__c===\"Yes\"){await __R.save(__id,__pw);}}}catch(__e2){}})();}}else if(e.logonState===\"disconnected\"){__R.pending.delete(__id);if(__R.usedSaved.has(__id)){__R.usedSaved.delete(__id);(async function(){try{await __R.del(__id);}catch(__e3){}})();}}}}catch(__e){}"
+    },
+    {
+      "target": "pkgjson",
+      "name": "forget-command",
+      "find": "\"commands\": [",
+      "replace": "\"commands\": [{\"command\":\"adt-vscode.forgetRfcPassword\",\"category\":\"ABAP\",\"title\":\"Forget Saved RFC Password\"},"
+    }
+  ]
+}

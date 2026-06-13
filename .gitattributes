@@ -1,0 +1,12 @@
+# Normalize line endings in the repo to LF on commit.
+* text=auto eol=lf
+
+# The bash patcher and the payloads must stay LF on every platform.
+*.sh text eol=lf
+patch/payloads.json text eol=lf
+
+# PowerShell is happy with either, but CRLF is friendlier on Windows.
+*.ps1 text eol=crlf
+
+# Screenshots and other images are binary; never apply EOL conversion.
+*.png binary
