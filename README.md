@@ -116,6 +116,11 @@ the patched extension is loaded.
 
 ### Forgetting a saved password
 
+The command appears in the Command Palette as **ABAP: Forget Saved RFC
+Password**:
+
+![The "ABAP: Forget Saved RFC Password" entry in the VS Code Command Palette](docs/forget_saved_rfc_password.png)
+
 1. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
 2. Run **`ABAP: Forget Saved RFC Password`**.
 3. Pick the destination whose password you want to remove.
